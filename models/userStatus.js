@@ -208,6 +208,7 @@ const getAllUserStatus = async (query) => {
         userId: doc.data().userId,
         currentStatus: doc.data().currentStatus,
         monthlyHours: doc.data().monthlyHours,
+        from: doc.data().from,
       };
       allUserStatus.push(currentUserStatus);
     });
@@ -260,6 +261,7 @@ const updateUserStatus = async (userId, newStatusData) => {
       ) {
         await removeGroupRoleFromDiscordUser({ userId, roleName: "group-idle" });
       }
+      newStatusData.from = userStatusData.from;
       await userStatusModel.doc(docId).update(newStatusData);
       return { id: docId, userStatusExists: true, data: newStatusData };
     } else {
@@ -274,6 +276,7 @@ const updateUserStatus = async (userId, newStatusData) => {
           }
         }
       }
+      newStatusData.from = Date.now();
       const { id } = await userStatusModel.add({ userId, ...newStatusData });
       return { id, userStatusExists: false, data: newStatusData };
     }
@@ -525,6 +528,7 @@ const batchUpdateUsersStatus = async (users) => {
       const newUserStatusData = {
         userId,
         currentStatus: statusToUpdate,
+        from: Date.now(),
       };
       state === userState.ACTIVE ? summary.activeUsersAltered++ : summary.idleUsersAltered++;
       if (state === userState.IDLE) await addGroupRoleToDiscordUser({ userId, roleName: "group-idle" });

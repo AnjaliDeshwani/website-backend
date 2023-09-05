@@ -223,6 +223,7 @@ const createUserStatusWithState = async (userId, collection, state) => {
         until: "",
         updatedAt: currentTimeStamp,
       },
+      from: currentTimeStamp,
     });
   } catch (err) {
     logger.error(`error creating the current status for user id ${userId} - ${err.message}`);
